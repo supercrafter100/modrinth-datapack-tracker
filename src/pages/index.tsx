@@ -16,7 +16,7 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="bg-[#16181c] h-full py-5">
+      <main className="h-full py-5">
         <div className="mx-auto max-w-[80rem] h-full">
           <div className="bg-[#26292F] rounded-lg inline-block w-full p-5">
             <h1 className="font-bold text-2xl text-center">Downloads</h1>
