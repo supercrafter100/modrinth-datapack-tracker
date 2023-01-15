@@ -5,19 +5,7 @@ import pool from "./db";
 
 class StatisticsTracker {
 
-    private started = false;
     private readonly url = "https://api.modrinth.com/v2/search?limit=20&index=relevance&facets=[[%22categories:%27datapack%27%22],[%22project_type:mod%22]]";
-
-    public async run() {
-        if (this.started) {
-            return;
-        }
-
-        scheduleJob("0 0 * * *", () => this.track());
-
-        pool.query("CREATE TABLE IF NOT EXISTS `projects` (`project_id` VARCHAR(255) NOT NULL, `project_name` VARCHAR(255) NOT NULL, PRIMARY KEY (`project_id`))");
-        pool.query("CREATE TABLE IF NOT EXISTS `stats` (`id` INT NOT NULL AUTO_INCREMENT, `project_id` VARCHAR(255) NOT NULL, `downloads` INT NOT NULL, `follows` INT NOT NULL, `date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`id`))");
-    }
 
     /**
      * Track the stats of all 20 top datapack projects of modrinth 
