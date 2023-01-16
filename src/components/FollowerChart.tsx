@@ -4,6 +4,7 @@ import React from 'react'
 import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, Line, Legend } from 'recharts'
 import CustomizedTick from '@/components/CustomizedTick';
 import CustomTooltip from '@/components/CustomTooltip';
+import { makeColorGradient } from '@/lib/generateColours';
 
 const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
 
@@ -25,6 +26,11 @@ const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
 
     const THE_COLLECTOR = tooltipCollector();
 
+    const center = 128;
+    const width = 127;
+    const frequency = 2.4;
+    const colours = makeColorGradient(frequency, frequency, frequency, 0, 2, 4, center, width, uniqueProjects.length);
+
     return (
         <ResponsiveContainer width={"95%"} height={400}>
             <LineChart
@@ -42,8 +48,9 @@ const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
                 <XAxis dataKey={"date"} />
                 <YAxis allowDecimals={false} tick={<CustomizedTick THE_COLLECTOR={THE_COLLECTOR} />} />
                 <Tooltip itemSorter={(item) => (item.value as number) * -1} content={<CustomTooltip THE_COLLECTOR={THE_COLLECTOR} />} />
+                <Legend />
 
-                {uniqueProjects.map((proj, idx) => <Line key={idx} type="monotone" dataKey={proj} name={projectNames.find((item) => item.project_id === proj)?.project_name} stroke="#8884d8" />)}
+                {uniqueProjects.map((proj, idx) => <Line key={idx} type="monotone" dataKey={proj} name={projectNames.find((item) => item.project_id === proj)?.project_name} stroke={colours[idx]} />)}
             </LineChart>
         </ResponsiveContainer>
     )
