@@ -5,6 +5,9 @@ import useRequest from '@/hooks/useRequest'
 import { StatisticsResponse } from '@/types/StatisticsResponse'
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
+import * as tf from '@tensorflow/tfjs';
+import { ComputeSMA, makePrediction } from '@/lib/modelUtils';
+import { string } from '@tensorflow/tfjs-node';
 
 export default function Home({ data }: { data: StatisticsResponse[] }) {
 
@@ -13,6 +16,7 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
   const [filteredStats, setFilteredStats] = useState<any>([]);
 
   const [uniqueProjects, setUniqueProjects] = useState<{ name: string; id: string; }[]>([]);
+  const [futureData, setFutureData] = useState<{ id: string; day: Number; downloads: number }[]>([]);
 
   useEffect(() => setUniqueProjects(loaded ? filterUniqueProjects(stats) : []), [stats, loaded]);
 
@@ -38,6 +42,30 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
     });
     return unique;
   }
+
+  useEffect(() => {
+    if (uniqueProjects.length === 0) return;
+    for (const project of uniqueProjects) {
+      tf.loadLayersModel(`${process.env.NEXT_PUBLIC_MODEL_URL}/${project.id}/model.json`).then((model) => {
+        fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${project.id}/normalize.json`).then((res) => res.json()).then((data) => {
+          const window_size = 3;
+          const sma_vec = ComputeSMA(stats.filter((item: any) => item.project_id === project.id), window_size);
+          let inputs = sma_vec.map(inp_f => inp_f['set'].map(val => parseInt(val.downloads)));
+
+          let pred_X = [inputs[inputs.length - 1]];
+          const daysAhead = 10;
+          // Predict the upcoming 10 days
+          for (let i = 0; i < daysAhead; i++) {
+            let pred_y = makePrediction(pred_X, model, data.normalize);
+            setFutureData([...futureData, { id: project.id, day: i + 1, downloads: Math.round(pred_y[0]) }]);
+            pred_X[0].shift();
+            pred_X[0].push(Math.round(pred_y[0]));
+            console.log(`${project.name} day ${i + 1}: ${Math.round(pred_y[0])} downloads`)
+          }
+        }).catch((e) => console.log(e));
+      }).catch((e) => console.log(e));
+    }
+  }, [uniqueProjects])
 
   return (
     <>
