@@ -46,9 +46,9 @@ const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
             >
                 <CartesianGrid strokeDasharray={"3 3"} />
                 <XAxis dataKey={"date"} />
-                <YAxis allowDecimals={false} tick={<CustomizedTick THE_COLLECTOR={THE_COLLECTOR} />} />
+                <YAxis allowDecimals={false} tick={<CustomizedTick THE_COLLECTOR={THE_COLLECTOR} />} domain={['auto', 'auto']} />
                 <Tooltip itemSorter={(item) => (item.value as number) * -1} content={<CustomTooltip THE_COLLECTOR={THE_COLLECTOR} />} />
-                
+                {uniqueProjects.length < 10 && <Legend />}
 
                 {uniqueProjects.map((proj, idx) => <Line key={idx} type="monotone" dataKey={proj} name={projectNames.find((item) => item.project_id === proj)?.project_name} stroke={colours[idx]} />)}
             </LineChart>
