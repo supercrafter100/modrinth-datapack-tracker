@@ -31,7 +31,7 @@ const MultiSelect = ({ options, standard, selected, setSelected }: { options: { 
     }, []);
 
     return (
-        <div className="w-full flex flex-col items-center mx-auto" onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
+        <div className="w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto absolute z-10" onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
             <div className="w-full">
                 <div className="flex flex-col items-center relative">
                     <div className="p-1 flex rounded w-full h-full">

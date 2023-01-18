@@ -49,12 +49,12 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
       </Head>
       <main className="h-full py-5">
         <div className="mx-auto max-w-[80rem] h-full">
-          <div className="bg-[#26292F] rounded-lg p-3 grid grid-cols-3">
-            <div className="col-span-2 bg-[#434956] rounded-xl">
+          <div className="bg-[#26292F] rounded-lg p-3 grid grid-cols-3 h-16">
+            <div className="col-span-2 relative">
               <MultiSelect options={uniqueProjects.sort((a, b) => getLatestDownloads(b.id) - getLatestDownloads(a.id)).map((project) => { return { name: project.name, value: project.id } })} standard={""} selected={selectedProjects} setSelected={setSelectedProjects} />
             </div>
           </div>
-          <div className="bg-[#26292F] rounded-xl inline-block w-full p-5 mt-5">
+          <div className="bg-[#26292F] rounded-xl inline-block w-full p-5 mt-5 -z-50">
             <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Downloads</h1>
             {loaded && <DownloadChart data={filteredStats ?? stats} />}
           </div>
