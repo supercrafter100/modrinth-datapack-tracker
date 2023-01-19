@@ -6,7 +6,7 @@ import CustomizedTick from '@/components/CustomizedTick';
 import CustomTooltip from '@/components/CustomTooltip';
 import { makeColorGradient } from '@/lib/generateColours';
 
-const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
+const FollowerChart = ({ data }: { data: StatisticsResponse[] }) => {
 
     const uniqueProjects = Array.from(new Set(data.map((item) => item.project_id)));
     const projectNames = uniqueProjects.map((proj) => ({ project_id: proj, project_name: data.find((item) => item.project_id === proj)?.name ?? "Unknown" }));
@@ -56,4 +56,4 @@ const DownloadChart = ({ data }: { data: StatisticsResponse[] }) => {
     )
 }
 
-export default DownloadChart
+export default FollowerChart

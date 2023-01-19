@@ -31,7 +31,7 @@ const MultiSelect = ({ options, standard, selected, setSelected }: { options: { 
     }, []);
 
     return (
-        <div className="w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto absolute z-10" onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
+        <div className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
             <div className="w-full">
                 <div className="flex flex-col items-center relative">
                     <div className="p-1 flex rounded w-full h-full">
@@ -61,7 +61,7 @@ const MultiSelect = ({ options, standard, selected, setSelected }: { options: { 
                     </div>
                 </div>
                 <Collapse isOpened={dropdown}>
-                    <div className="shadow top-[100%] bg-[#434956] z-40 w-full left-0 rounded max-h-[300px] overflow-y-auto">
+                    <div className="shadow top-[100%] bg-[#434956] z-40 w-full left-0 rounded-b-xl max-h-[300px] overflow-y-auto">
                         <div className="flex flex-col w-full">
                             {options.map((item, idx) =>
                                 <div key={idx} className={"cursor-pointer w-full " + (selected.some(f => f.value === item.value) ? "bg-[#1bd96a] text-black font-bold" : "hover:bg-[#616570] text-[#A3BABC] hover:text-white")} onClick={() => toggleItem(item)}>
