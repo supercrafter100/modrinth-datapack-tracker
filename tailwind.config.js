@@ -8,7 +8,8 @@ module.exports = {
     extend: {
       colors: {
         card: '#26292F',
-        inputtext: '#ACB8C5'
+        inputtext: '#ACB8C5',
+        background: '#16181C'
       }
     },
   },

@@ -1,16 +1,9 @@
 import React, { useState, useEffect } from 'react'
 import { Collapse } from 'react-collapse';
 
-const Select = ({ options, standard, selected, setSelected }: { options: { name: string, value: string }[]; standard: string, selected: { name: string, value: string } | undefined; setSelected: Function }) => {
+const Select = ({ options, selected, setSelected }: { options: { name: string, value: string }[]; selected: { name: string, value: string } | undefined; setSelected: Function }) => {
 
     const [dropdown, setDropdown] = useState(false);
-
-    useEffect(() => {
-        const i = options.find(c => c.value === standard);
-        if (i) {
-            setSelected([i]);
-        }
-    }, []);
 
     return (
         <div className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>

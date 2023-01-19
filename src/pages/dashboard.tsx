@@ -23,12 +23,14 @@ const Dashboard = () => {
     const [selectedProjectStats, setSelectedProjectStats] = useState<any>([]);
 
     useEffect(() => {
+        if (!stats) return;
+
         setUniqueProjects(loaded ? filterUniqueProjects(stats) : []);
-        const projectStat = uniqueProjects.find((item: any) => item.id === projectId);
+        const projectStat = stats.filter((f: any) => f.project_id === projectId)[0];
         if (projectStat) {
-            setProject({ name: projectStat.name, value: projectStat.id });
+            setProject({ name: projectStat.name, value: projectStat.project_id });
         }
-    }, [stats, loaded]);
+    }, [stats, loaded, projectId]);
 
     const filterUniqueProjects = (projects: { name: string; project_id: string; }[]) => {
         const unique: any[] = [];
@@ -40,19 +42,39 @@ const Dashboard = () => {
         return unique;
     }
 
+    const setProjectFunction = (value: { name: string; value: string; }) => {
+        setProject(value);
+        router.push(`/dashboard?project=${value.value}`, undefined, { shallow: true });
+    }
+
     const fetchModrinthData = async (id: string) => {
-        const res = await fetch(`https://api.modrinth.com/v2/project/${id}`);
+        const res = await fetch(`https://api.modrinth.com/v2/project/${id}`).catch((err) => console.error(err));
+        if (!res) {
+            return;
+        }
+
         const data = await res.json();
         setModrinthProject(data);
     }
 
+    const getTopDownloadedProjects = () => {
+        if (!stats) return [];
+        const downloadedProjects: { name: string; downloads: number }[] = [];
+
+        for (const proj of uniqueProjects) {
+            const projectStats = stats.filter((item: any) => item.project_id === proj.id);
+            if (projectStats.length > 0) {
+                downloadedProjects.push({ name: proj.name, downloads: (projectStats[projectStats.length - 1].downloads - projectStats[projectStats.length - 2].downloads) });
+            }
+        }
+
+        return downloadedProjects.sort((a, b) => b.downloads - a.downloads).slice(0, 15);
+    }
+
     useEffect(() => {
-        if (!loaded || !project) return;
+        if (!loaded || !project || !stats) return;
         setSelectedProjectStats(stats.filter((item: any) => item.project_id === project.value).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()));
         fetchModrinthData(project.value);
-
-        router.query.project = project.value;
-        router.push(router);
     }, [stats, project, loaded]);
 
     const calculateDownloadPercentage = () => {
@@ -103,7 +125,7 @@ const Dashboard = () => {
                     {/* Top level selection */}
                     <div className="bg-card rounded-lg p-3 flex justify-center content-center">
                         <div className="w-1/2">
-                            <Select selected={project} setSelected={setProject} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id }))} standard={projectId} />
+                            <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id }))} />
                         </div>
                     </div>
 
@@ -115,16 +137,46 @@ const Dashboard = () => {
                         <StatisticsTopCard title="Follows today" value={((modrinthProject?.followers ?? 0) - selectedProjectStats[selectedProjectStats.length - 1]?.follows).toString() ?? "?"} percent={calculateFollowersPercentage()} />
                     </div>
 
-                    {/* Download chart */}
-                    <div className="bg-card rounded-lg p-3 w-full mt-5">
-                        <h2 className="text-inputtext text-2xl font-bold text-center">Downloads</h2>
-                        <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={[]} />
-                    </div>
+                    {/* Segment for sidebar */}
+                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                        {/* Download chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-span-3">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Downloads</h2>
+                            <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={[]} />
+                        </div>
 
-                    {/* Followers chart */}
-                    <div className="bg-card rounded-lg p-3 w-full mt-5">
-                        <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
-                        <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
+                        {/* Followers chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-span-3">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
+                            <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
+                        </div>
+
+                        {/* Sidebar */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-start-4 col-end-5 row-start-1 row-end-3">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads yesterday</h2>
+                            <div className="relative overflow-x-auto mt-2 rounded-lg">
+                                <table className="w-full text-sm text-left text-inputtext">
+                                    <thead className="text-xs bg-gray-700 text-gray-400">
+                                        <tr>
+                                            <th className="px-6 py-3">Project</th>
+                                            <th className="px-6 py-3">Downloads</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        {getTopDownloadedProjects().map((item, idx) => (
+                                            <tr key={idx} className="bg-background border-gray-700">
+                                                <th className="px-6 py-4 font-medium text-white">
+                                                    {item.name}
+                                                </th>
+                                                <td className="px-6 py-4">
+                                                    {item.downloads}
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
