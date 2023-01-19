@@ -1,23 +1,21 @@
 import DownloadChart from '@/components/DownloadChart'
 import FollowerChart from '@/components/FollowerChart';
 import MultiSelect from '@/components/form/MultiSelect';
+import Toggle from '@/components/form/Toggle';
 import useRequest from '@/hooks/useRequest'
 import { StatisticsResponse } from '@/types/StatisticsResponse'
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
-import * as tf from '@tensorflow/tfjs';
-import { ComputeSMA, makePrediction } from '@/lib/modelUtils';
-import { string, unique } from '@tensorflow/tfjs-node';
 
 export default function Home({ data }: { data: StatisticsResponse[] }) {
 
   const [stats, loaded] = useRequest('/api/stats');
   const [selectedProjects, setSelectedProjects] = useState<{ name: string; value: string }[]>([]);
   const [filteredStats, setFilteredStats] = useState<any>([]);
+  const [showFuture, setShowFuture] = useState<boolean>(false);
 
   const [uniqueProjects, setUniqueProjects] = useState<{ name: string; id: string; }[]>([]);
   const [futureData, setFutureData] = useState<{ id: string; day: number; downloads: number }[]>([]);
-  const [futureDataLoaded, setFutureDataLoaded] = useState(false);
 
   useEffect(() => setUniqueProjects(loaded ? filterUniqueProjects(stats) : []), [stats, loaded]);
 
@@ -49,7 +47,6 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
     for (const project of uniqueProjects) {
       await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${project.id}/future.json`).then((res) => res.json()).then((data) => {
         d = [...d, ...data];
-        console.log(data, d.length)
       }).catch((e) => console.log(e));
     }
     setFutureData(d);
@@ -57,7 +54,7 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
 
   useEffect(() => {
     if (uniqueProjects.length === 0) return;
-    getFutureData().then(() => setFutureDataLoaded(true));
+    getFutureData();
 
   }, [uniqueProjects])
 
@@ -75,10 +72,13 @@ export default function Home({ data }: { data: StatisticsResponse[] }) {
             <div className="col-span-2">
               <MultiSelect options={uniqueProjects.sort((a, b) => getLatestDownloads(b.id) - getLatestDownloads(a.id)).map((project) => { return { name: project.name, value: project.id } })} standard={""} selected={selectedProjects} setSelected={setSelectedProjects} />
             </div>
+            <div className="flex items-center justify-center">
+              <Toggle toggled={showFuture} setToggled={setShowFuture} text="Show future predictions" />
+            </div>
           </div>
           <div className="bg-[#26292F] rounded-xl inline-block w-full p-5 mt-5 -z-50">
             <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Downloads</h1>
-            {loaded && <DownloadChart data={filteredStats ?? stats} futureData={futureData ?? []} />}
+            {loaded && <DownloadChart data={filteredStats ?? stats} futureData={showFuture ? futureData ?? [] : []} />}
           </div>
           <div className="mx-auto max-w-[80rem] h-full">
             <div className="mt-12 bg-[#26292F] rounded-lg inline-block w-full p-5">

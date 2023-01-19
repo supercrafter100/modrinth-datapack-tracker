@@ -14,9 +14,14 @@ const DownloadChart = ({ data, futureData }: { data: StatisticsResponse[], futur
 
     const projectData = oneProjectData.map((item) => {
         let obj: Record<string, string | number> = {};
-        const d = new Date(item.date);
 
-        obj["date"] = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+        if (item.date !== "TODAY") {
+            const d = new Date(item.date);
+            obj["date"] = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+        } else {
+            obj["date"] = "NOW";
+        }
+
         for (const proj of uniqueProjects) {
             const projData = data.find((itm) => itm.project_id === proj && itm.date === item.date);
             obj[proj] = projData?.downloads ?? 0;
@@ -46,10 +51,18 @@ const DownloadChart = ({ data, futureData }: { data: StatisticsResponse[], futur
 
     const THE_COLLECTOR = tooltipCollector();
 
+    // Colours
     const center = 128;
     const width = 127;
     const frequency = 2.4;
     const colours = makeColorGradient(frequency, frequency, frequency, 0, 2, 4, center, width, uniqueProjects.length);
+
+    const renderColorfulLegendText = (value: string, entry: any) => {
+        const { color } = entry;
+        const projId = color.split('-')[1].slice(0, -1);
+        const idx = uniqueProjects.indexOf(projId);
+        return <span style={{ color: colours[idx] }}>{value}</span>;
+    };
 
     return (
         <ResponsiveContainer width={"95%"} height={400}>
@@ -73,7 +86,7 @@ const DownloadChart = ({ data, futureData }: { data: StatisticsResponse[], futur
                 <XAxis dataKey={"date"} />
                 <YAxis allowDecimals={false} tick={<CustomizedTick THE_COLLECTOR={THE_COLLECTOR} />} domain={['auto', 'auto']} />
                 <Tooltip itemSorter={(item) => (item.value as number) * -1} content={<CustomTooltip THE_COLLECTOR={THE_COLLECTOR} />} />
-                {uniqueProjects.length < 10 && <Legend />}
+                {uniqueProjects.length < 10 && <Legend formatter={renderColorfulLegendText} />}
 
                 {uniqueProjects.map((proj, idx) => (
                     <>

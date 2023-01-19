@@ -14,9 +14,14 @@ const FollowerChart = ({ data }: { data: StatisticsResponse[] }) => {
 
     const projectData = oneProjectData.map((item) => {
         let obj: Record<string, string | number> = {};
-        const d = new Date(item.date);
 
-        obj["date"] = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+        if (item.date !== "TODAY") {
+            const d = new Date(item.date);
+            obj["date"] = d.getDate() + "/" + (d.getMonth() + 1) + "/" + d.getFullYear();
+        } else {
+            obj["date"] = "NOW";
+        }
+
         for (const proj of uniqueProjects) {
             const projData = data.find((itm) => itm.project_id === proj && itm.date === item.date);
             obj[proj] = projData?.follows ?? 0;
