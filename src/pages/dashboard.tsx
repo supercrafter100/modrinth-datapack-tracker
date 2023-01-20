@@ -10,6 +10,8 @@ import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
 import Toggle from '@/components/form/Toggle';
 import AverageGrowthChart from '@/components/AverageGrowthChart';
+import Link from 'next/link';
+import Image from 'next/image';
 
 const Dashboard = () => {
 
@@ -152,6 +154,10 @@ const Dashboard = () => {
                         <div className="w-3/4 lg:w-1/2">
                             <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
                         </div>
+                        <Link href={`https://modrinth.com/project/${project?.value || '5y2R1ofr'}`} className="ml-2 flex items-center border-primarygreen border-2 rounded-lg p-1">
+                            <Image src="/modrinth-logo.svg" alt="modrinth-logo" width={24} height={24} className="inline-block" />
+                            <span className="text-primarygreen font-medium ml-1">Modrinth</span>
+                        </Link>
                     </div>
 
                     {/* Quick statistics */}
