@@ -21,3 +21,4 @@ export interface ModrinthProject {
     featured_gallery: string;
     color: number;
 }
+

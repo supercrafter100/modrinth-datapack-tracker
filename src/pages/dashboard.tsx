@@ -9,7 +9,6 @@ import DownloadChart from '@/components/DownloadChart';
 import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
 import Toggle from '@/components/form/Toggle';
-import AverageGrowthChart from '@/components/AverageGrowthChart';
 
 const Dashboard = () => {
 
@@ -19,7 +18,8 @@ const Dashboard = () => {
     const [project, setProject] = useState<{ name: string; value: string; }>();
     const [modrinthProject, setModrinthProject] = useState<ModrinthProject | undefined>();
 
-    const [stats, loaded] = useRequest('/api/stats');
+    const [modrinthProjectListings, loadedModrinthProjectListings] = useRequest<{ hits: ModrinthProject[] }>('https://api.modrinth.com/v2/search?limit=20&index=relevance&facets=[[%22categories:%27datapack%27%22],[%22project_type:mod%22]]');
+    const [stats, loaded] = useRequest<any>('/api/stats');
     const [uniqueProjects, setUniqueProjects] = useState<{ name: string; id: string; }[]>([]);
 
     const [selectedProjectStats, setSelectedProjectStats] = useState<any>([]);
@@ -66,7 +66,7 @@ const Dashboard = () => {
         setFutureProjectStats(result);
     }
 
-    const getTopDownloadedProjects = () => {
+    const getTopDownloadedProjectsYesterday = () => {
         if (!stats) return [];
         const downloadedProjects: { name: string; downloads: number }[] = [];
 
@@ -77,7 +77,21 @@ const Dashboard = () => {
             }
         }
 
-        return downloadedProjects.sort((a, b) => b.downloads - a.downloads).slice(0, 15);
+        return downloadedProjects.sort((a, b) => b.downloads - a.downloads).slice(0, 6);
+    }
+
+    const getTopDownloadedProjectsToday = () => {
+        if (!loadedModrinthProjectListings) return [];
+        const downloadedProjects: { name: string; downloads: number }[] = [];
+
+        for (const proj of modrinthProjectListings!.hits) {
+            const projectStats = stats.filter((item: any) => item.project_id === proj.project_id);
+            if (projectStats.length > 0) {
+                downloadedProjects.push({ name: proj.title, downloads: proj.downloads - projectStats[projectStats.length - 1].downloads });
+            }
+        }
+
+        return downloadedProjects.sort((a, b) => b.downloads - a.downloads).slice(0, 6);
     }
 
     useEffect(() => {
@@ -167,31 +181,16 @@ const Dashboard = () => {
                             <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
                         </div>
 
-                        {/* Sidebar */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-1 xl:row-end-3">
+                        {/* Sidebar today*/}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-1 xl:row-end-2">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads today</h2>
+                            <DownloadsTable data={getTopDownloadedProjectsToday()} />
+                        </div>
+
+                        {/* Sidebar yesterday*/}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-2 xl:row-end-3">
                             <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads yesterday</h2>
-                            <div className="relative overflow-x-auto mt-2 rounded-lg">
-                                <table className="w-full text-sm text-left text-inputtext">
-                                    <thead className="text-xs bg-gray-700 text-gray-400">
-                                        <tr>
-                                            <th className="px-6 py-3">Project</th>
-                                            <th className="px-6 py-3">Downloads</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        {getTopDownloadedProjects().map((item, idx) => (
-                                            <tr key={idx} className="bg-background border-gray-700">
-                                                <th className="px-6 py-4 font-medium text-white">
-                                                    {item.name}
-                                                </th>
-                                                <td className="px-6 py-4">
-                                                    {item.downloads}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
-                            </div>
+                            <DownloadsTable data={getTopDownloadedProjectsYesterday()} />
                         </div>
                     </div>
                 </div>
@@ -220,7 +219,31 @@ const StatisticsTopCard = ({ title, value, percent }: { title: string, value: st
             </div>
         </div>
     )
+}
 
+const DownloadsTable = ({ data }: { data: { name: string; downloads: number }[] }) => {
+    return <div className="relative overflow-x-auto mt-2 rounded-lg">
+        <table className="w-full text-sm text-left text-inputtext">
+            <thead className="text-xs bg-gray-700 text-gray-400">
+                <tr>
+                    <th className="px-6 py-3">Project</th>
+                    <th className="px-6 py-3">Downloads</th>
+                </tr>
+            </thead>
+            <tbody>
+                {data.map((item, idx) => (
+                    <tr key={idx} className="bg-background border-gray-700">
+                        <th className="px-6 py-4 font-medium text-white">
+                            {item.name}
+                        </th>
+                        <td className="px-6 py-4">
+                            {item.downloads}
+                        </td>
+                    </tr>
+                ))}
+            </tbody>
+        </table>
+    </div>
 }
 
 export default Dashboard

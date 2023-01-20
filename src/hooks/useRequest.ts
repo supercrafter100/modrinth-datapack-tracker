@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 
-export default function useRequest(url: string, method = 'GET'): [any, boolean, any, () => void] {
+export default function useRequest<T>(url: string, method = 'GET'): [T | null, boolean, any, () => void] {
     const [data, setData] = useState(null);
     const [err, setError] = useState(null);
 
@@ -25,5 +25,5 @@ export default function useRequest(url: string, method = 'GET'): [any, boolean, 
     if (data === null) {
         return [null, false, err, refetch];
     }
-    return [data, true, err, refetch];
+    return [data as T, true, err, refetch];
 }
