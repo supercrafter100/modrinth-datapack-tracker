@@ -66,17 +66,11 @@ const DownloadChart = ({ data, futureData }: { data: StatisticsResponse[], futur
     };
 
     return (
-        <ResponsiveContainer width={"95%"} height={400}>
+        <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 width={500}
                 height={300}
                 data={totalProjectData}
-                margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                }}
             >
                 <defs>
                     <linearGradient id="futureGradient" x1="0" y1="0" x2="100%" y2="0">

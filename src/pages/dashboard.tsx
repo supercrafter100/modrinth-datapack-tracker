@@ -163,41 +163,42 @@ const Dashboard = () => {
                     </div>
 
                     {/* Segment for sidebar */}
-                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
-                        {/* Download chart */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
-                            <div className="text-inputtext text-2xl font-bold text-center relative">
-                                Downloads
-                                <div className="float-right inline-block sm:absolute sm:right-0">
-                                    <Toggle toggled={showFuture} setToggled={setShowFuture} text="Show future predictions" />
-                                </div>
-                            </div>
-
-                            <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={showFuture ? futureProjectStats : []} />
-                        </div>
-
-                        {/* Growth chart */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
-                            <h2 className="text-inputtext text-2xl font-bold text-center">Growth</h2>
-                            <AverageGrowthChart label={"downloads"} data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
-                        </div>
-
-                        {/* Followers chart */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
-                            <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
-                            <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
-                        </div>
+                    <div className="grid grid-cols-1 2xl:grid-cols-4 gap-4">
 
                         {/* Sidebar today*/}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-1 xl:row-end-2">
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-start-1 2xl:col-end-2 2xl:row-start-1 2xl:row-end-2">
                             <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads today</h2>
                             <DownloadsTable data={getTopDownloadedProjectsToday()} />
                         </div>
 
                         {/* Sidebar yesterday*/}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-2 xl:row-end-3">
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-start-1 2xl:col-end-2 2xl:row-start-2 2xl:row-end-3">
                             <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads yesterday</h2>
                             <DownloadsTable data={getTopDownloadedProjectsYesterday()} />
+                        </div>
+
+                        {/* Download chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-span-3">
+                            <div className="text-inputtext text-2xl font-bold text-center relative">
+                                Downloads
+                            </div>
+
+                            <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={showFuture ? futureProjectStats : []} />
+                            <div className="flex justify-center">
+                                <Toggle toggled={showFuture} setToggled={setShowFuture} text="Show future predictions" />
+                            </div>
+                        </div>
+
+                        {/* Growth chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-span-3">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Growth</h2>
+                            <AverageGrowthChart label={"downloads"} data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
+                        </div>
+
+                        {/* Followers chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-span-3 2xl:col-start-2 2xl:col-end-5">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
+                            <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
                         </div>
                     </div>
                 </div>

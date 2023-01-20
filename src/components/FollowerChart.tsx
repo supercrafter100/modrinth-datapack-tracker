@@ -37,17 +37,11 @@ const FollowerChart = ({ data }: { data: StatisticsResponse[] }) => {
     const colours = makeColorGradient(frequency, frequency, frequency, 0, 2, 4, center, width, uniqueProjects.length);
 
     return (
-        <ResponsiveContainer width={"95%"} height={400}>
+        <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 width={500}
                 height={300}
                 data={projectData}
-                margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                }}
             >
                 <CartesianGrid strokeDasharray={"3 3"} />
                 <XAxis dataKey={"date"} />

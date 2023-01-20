@@ -52,17 +52,11 @@ const AverageGrowthChart = ({ data, label = "average" }: { data: StatisticsRespo
 
 
     return (
-        <ResponsiveContainer width={"95%"} height={400}>
+        <ResponsiveContainer width={"100%"} height={400}>
             <LineChart
                 width={500}
                 height={300}
                 data={calculateDailyAverageDownloadCount()}
-                margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5
-                }}
             >
                 <CartesianGrid strokeDasharray={"3 3"} />
                 <XAxis dataKey={"date"} />
