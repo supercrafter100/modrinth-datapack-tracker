@@ -5,7 +5,7 @@ import { ResponsiveContainer, LineChart, CartesianGrid, XAxis, YAxis, Tooltip, L
 import CustomizedTick from './CustomizedTick';
 import CustomTooltip from './CustomTooltip';
 
-const AverageGrowthChart = ({ data }: { data: StatisticsResponse[] }) => {
+const AverageGrowthChart = ({ data, label = "average" }: { data: StatisticsResponse[], label?: string }) => {
 
     const uniqueProjects = Array.from(new Set(data.map((item) => item.project_id)));
     const oneProjectData = data.filter((item) => item.project_id === uniqueProjects[0]);
@@ -68,7 +68,7 @@ const AverageGrowthChart = ({ data }: { data: StatisticsResponse[] }) => {
                 <XAxis dataKey={"date"} />
                 <YAxis tick={<CustomizedTick THE_COLLECTOR={THE_COLLECTOR} />} allowDecimals={false} domain={['auto', 'auto']} />
                 <Tooltip content={<CustomTooltip THE_COLLECTOR={THE_COLLECTOR} />} />
-                <Line type="monotone" dataKey={"average"} stroke={"#1BD96A"} />
+                <Line type="monotone" dataKey={"average"} stroke={"#1BD96A"} name={label} />
             </LineChart>
         </ResponsiveContainer>
     )

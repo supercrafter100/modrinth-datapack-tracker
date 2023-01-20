@@ -9,6 +9,7 @@ import DownloadChart from '@/components/DownloadChart';
 import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
 import Toggle from '@/components/form/Toggle';
+import AverageGrowthChart from '@/components/AverageGrowthChart';
 
 const Dashboard = () => {
 
@@ -81,7 +82,7 @@ const Dashboard = () => {
     }
 
     const getTopDownloadedProjectsToday = () => {
-        if (!loadedModrinthProjectListings) return [];
+        if (!loadedModrinthProjectListings || !loaded) return [];
         const downloadedProjects: { name: string; downloads: number }[] = [];
 
         for (const proj of modrinthProjectListings!.hits) {
@@ -173,6 +174,12 @@ const Dashboard = () => {
                             </div>
 
                             <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={showFuture ? futureProjectStats : []} />
+                        </div>
+
+                        {/* Growth chart */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
+                            <h2 className="text-inputtext text-2xl font-bold text-center">Growth</h2>
+                            <AverageGrowthChart label={"downloads"} data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
                         </div>
 
                         {/* Followers chart */}
