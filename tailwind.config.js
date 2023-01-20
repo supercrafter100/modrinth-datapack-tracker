@@ -9,7 +9,8 @@ module.exports = {
       colors: {
         card: '#26292F',
         inputtext: '#ACB8C5',
-        background: '#16181C'
+        background: '#16181C',
+        primarygreen: '#1BD96A'
       }
     },
   },

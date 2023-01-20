@@ -1,3 +1,4 @@
+import AverageGrowthChart from '@/components/AverageGrowthChart';
 import DownloadChart from '@/components/DownloadChart'
 import FollowerChart from '@/components/FollowerChart';
 import MultiSelect from '@/components/form/MultiSelect';
@@ -79,11 +80,17 @@ export default function Home() {
             <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Downloads</h1>
             {loaded && <DownloadChart data={filteredStats ?? stats} futureData={showFuture ? futureData ?? [] : []} />}
           </div>
-          <div className="mx-auto max-w-[80rem] h-full">
-            <div className="mt-12 bg-[#26292F] rounded-lg inline-block w-full p-5">
-              <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Followers</h1>
-              {loaded && <FollowerChart data={filteredStats ?? stats} />}
-            </div>
+        </div>
+        <div className="mx-auto max-w-[80rem] h-full">
+          <div className="mt-12 bg-[#26292F] rounded-lg inline-block w-full p-5">
+            <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Followers</h1>
+            {loaded && <FollowerChart data={filteredStats ?? stats} />}
+          </div>
+        </div>
+        <div className="mx-auto max-w-[80rem] h-full">
+          <div className="mt-12 bg-[#26292F] rounded-lg inline-block w-full p-5">
+            <h1 className="font-bold text-2xl text-center bg-clip-text bg-gradient-to-b from-green-500 to-green-400 text-transparent">Average growth</h1>
+            {loaded && <AverageGrowthChart data={filteredStats ?? stats} />}
           </div>
         </div>
       </main>

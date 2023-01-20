@@ -9,6 +9,7 @@ import DownloadChart from '@/components/DownloadChart';
 import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
 import Toggle from '@/components/form/Toggle';
+import AverageGrowthChart from '@/components/AverageGrowthChart';
 
 const Dashboard = () => {
 
