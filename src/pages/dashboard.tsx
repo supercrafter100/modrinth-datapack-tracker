@@ -150,7 +150,7 @@ const Dashboard = () => {
                     {/* Top level selection */}
                     <div className="bg-card rounded-lg p-3 flex justify-center content-center">
                         <div className="w-3/4 lg:w-1/2">
-                            <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id }))} />
+                            <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
                         </div>
                     </div>
 

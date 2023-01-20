@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { Collapse } from 'react-collapse';
 
 const Select = ({ options, selected, setSelected }: { options: { name: string, value: string }[]; selected: { name: string, value: string } | undefined; setSelected: Function }) => {
@@ -6,7 +6,7 @@ const Select = ({ options, selected, setSelected }: { options: { name: string, v
     const [dropdown, setDropdown] = useState(false);
 
     return (
-        <div className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
+        <div className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { setDropdown(!dropdown) }}>
             <div className="w-full">
                 <div className="flex flex-col items-center relative">
                     <div className="p-1 flex rounded w-full h-full">
