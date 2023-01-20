@@ -3,11 +3,10 @@ import FollowerChart from '@/components/FollowerChart';
 import MultiSelect from '@/components/form/MultiSelect';
 import Toggle from '@/components/form/Toggle';
 import useRequest from '@/hooks/useRequest'
-import { StatisticsResponse } from '@/types/StatisticsResponse'
 import Head from 'next/head'
 import { useEffect, useState } from 'react';
 
-export default function Home({ data }: { data: StatisticsResponse[] }) {
+export default function Home() {
 
   const [stats, loaded] = useRequest('/api/stats');
   const [selectedProjects, setSelectedProjects] = useState<{ name: string; value: string }[]>([]);
