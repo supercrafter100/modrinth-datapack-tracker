@@ -35,7 +35,8 @@ const DownloadChart = ({ data, futureData }: { data: StatisticsResponse[], futur
 
         let obj: Record<string, string | number> = {};
 
-        const lastDate = new Date(oneProjectData[oneProjectData.length - 1].date);
+
+        const lastDate = (oneProjectData[oneProjectData.length - 1].date === "TODAY") ? new Date(oneProjectData[oneProjectData.length - 2].date) : new Date(oneProjectData[oneProjectData.length - 1].date);
         lastDate.setDate(lastDate.getDate() + item.day);
 
         obj["date"] = lastDate.getDate() + "/" + (lastDate.getMonth() + 1) + "/" + lastDate.getFullYear();

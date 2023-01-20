@@ -8,6 +8,7 @@ import { ModrinthProject } from '@/types/ModrinthAPI';
 import DownloadChart from '@/components/DownloadChart';
 import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
+import Toggle from '@/components/form/Toggle';
 
 const Dashboard = () => {
 
@@ -21,6 +22,8 @@ const Dashboard = () => {
     const [uniqueProjects, setUniqueProjects] = useState<{ name: string; id: string; }[]>([]);
 
     const [selectedProjectStats, setSelectedProjectStats] = useState<any>([]);
+    const [futureProjectStats, setFutureProjectStats] = useState<any>([]);
+    const [showFuture, setShowFuture] = useState<boolean>(false);
 
     useEffect(() => {
         if (!stats) return;
@@ -57,6 +60,11 @@ const Dashboard = () => {
         setModrinthProject(data);
     }
 
+    const fetchFutureData = async (id: string) => {
+        const result = await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${id}/future.json`).then((res) => res.json());
+        setFutureProjectStats(result);
+    }
+
     const getTopDownloadedProjects = () => {
         if (!stats) return [];
         const downloadedProjects: { name: string; downloads: number }[] = [];
@@ -75,6 +83,7 @@ const Dashboard = () => {
         if (!loaded || !project || !stats) return;
         setSelectedProjectStats(stats.filter((item: any) => item.project_id === project.value).sort((a: any, b: any) => new Date(a.date).getTime() - new Date(b.date).getTime()));
         fetchModrinthData(project.value);
+        fetchFutureData(project.value);
     }, [stats, project, loaded]);
 
     const calculateDownloadPercentage = () => {
@@ -88,10 +97,10 @@ const Dashboard = () => {
         }
 
         if (downloadsReceivedToday > downloadsReceivedYesterday) {
-            return Math.round((downloadsReceivedToday / downloadsReceivedYesterday) * 100) / 100;
+            return downloadsReceivedYesterday > 0 ? Math.round((downloadsReceivedToday / downloadsReceivedYesterday) * 100) / 100 : downloadsReceivedToday * 100;
         }
 
-        return Math.round(((downloadsReceivedYesterday) / downloadsReceivedToday) * 100) / 100 * -1;
+        return downloadsReceivedYesterday > 0 ? Math.round((downloadsReceivedToday - downloadsReceivedYesterday) / downloadsReceivedYesterday * 10000) / 100 : downloadsReceivedYesterday;
     }
 
     const calculateFollowersPercentage = () => {
@@ -109,7 +118,7 @@ const Dashboard = () => {
             return followsReceivedYesterday > 0 ? Math.round((followsReceivedToday / followsReceivedYesterday) * 100) / 100 : followsReceivedToday * 100;
         }
 
-        return followsReceivedToday > 0 ? Math.round(((followsReceivedYesterday) / followsReceivedToday) * 100) / 100 * -1 : followsReceivedYesterday * -100;
+        return followsReceivedYesterday > 0 ? Math.round((followsReceivedToday - followsReceivedYesterday) / followsReceivedYesterday * 10000) / 100 : followsReceivedYesterday;
     }
 
     return (
@@ -124,7 +133,7 @@ const Dashboard = () => {
                 <div className="mx-auto max-w-[80vw] h-full">
                     {/* Top level selection */}
                     <div className="bg-card rounded-lg p-3 flex justify-center content-center">
-                        <div className="w-1/2">
+                        <div className="w-3/4 lg:w-1/2">
                             <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id }))} />
                         </div>
                     </div>
@@ -138,21 +147,27 @@ const Dashboard = () => {
                     </div>
 
                     {/* Segment for sidebar */}
-                    <div className="grid grid-cols-1 lg:grid-cols-4 gap-4">
+                    <div className="grid grid-cols-1 xl:grid-cols-4 gap-4">
                         {/* Download chart */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-span-3">
-                            <h2 className="text-inputtext text-2xl font-bold text-center">Downloads</h2>
-                            <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={[]} />
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
+                            <div className="text-inputtext text-2xl font-bold text-center relative">
+                                Downloads
+                                <div className="float-right inline-block sm:absolute sm:right-0">
+                                    <Toggle toggled={showFuture} setToggled={setShowFuture} text="Show future predictions" />
+                                </div>
+                            </div>
+
+                            <DownloadChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} futureData={showFuture ? futureProjectStats : []} />
                         </div>
 
                         {/* Followers chart */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-span-3">
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-span-3">
                             <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
                             <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
                         </div>
 
                         {/* Sidebar */}
-                        <div className="bg-card rounded-lg p-3 w-full mt-5 col-start-4 col-end-5 row-start-1 row-end-3">
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 xl:col-start-4 xl:col-end-5 xl:row-start-1 xl:row-end-3">
                             <h2 className="text-inputtext text-2xl font-bold text-center">Top downloads yesterday</h2>
                             <div className="relative overflow-x-auto mt-2 rounded-lg">
                                 <table className="w-full text-sm text-left text-inputtext">
