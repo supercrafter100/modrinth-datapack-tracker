@@ -76,7 +76,7 @@ const Dashboard = () => {
         for (const proj of uniqueProjects) {
             const projectStats = stats.filter((item: any) => item.project_id === proj.id);
             if (projectStats.length > 0) {
-                downloadedProjects.push({ name: proj.name, downloads: (projectStats[projectStats.length - 1].downloads - projectStats[projectStats.length - 2].downloads) });
+                downloadedProjects.push({ name: proj.name, downloads: (projectStats[projectStats.length - 1].downloads - projectStats[projectStats.length - 2]?.downloads) });
             }
         }
 
@@ -107,7 +107,7 @@ const Dashboard = () => {
     const calculateDownloadPercentage = () => {
         if (!selectedProjectStats.length) return 0;
 
-        const downloadsReceivedYesterday = selectedProjectStats[selectedProjectStats.length - 1].downloads - selectedProjectStats[selectedProjectStats.length - 2].downloads;
+        const downloadsReceivedYesterday = selectedProjectStats[selectedProjectStats.length - 1].downloads - selectedProjectStats[selectedProjectStats.length - 2]?.downloads;
         const downloadsReceivedToday = (modrinthProject?.downloads ?? 0) - selectedProjectStats[selectedProjectStats.length - 1].downloads;
 
         if (downloadsReceivedYesterday === downloadsReceivedToday) {
@@ -124,7 +124,7 @@ const Dashboard = () => {
     const calculateFollowersPercentage = () => {
         if (!selectedProjectStats.length) return 0;
 
-        const followsReceivedYesterday = selectedProjectStats[selectedProjectStats.length - 1].follows - selectedProjectStats[selectedProjectStats.length - 2].follows;
+        const followsReceivedYesterday = selectedProjectStats[selectedProjectStats.length - 1].follows - selectedProjectStats[selectedProjectStats.length - 2]?.follows;
         const followsReceivedToday = (modrinthProject?.followers ?? 0) - selectedProjectStats[selectedProjectStats.length - 1].follows;
 
 
