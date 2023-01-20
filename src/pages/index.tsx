@@ -9,7 +9,7 @@ import { useEffect, useState } from 'react';
 
 export default function Home() {
 
-  const [stats, loaded] = useRequest('/api/stats');
+  const [stats, loaded] = useRequest<any>('/api/stats');
   const [selectedProjects, setSelectedProjects] = useState<{ name: string; value: string }[]>([]);
   const [filteredStats, setFilteredStats] = useState<any>([]);
   const [showFuture, setShowFuture] = useState<boolean>(false);
