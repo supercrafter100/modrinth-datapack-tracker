@@ -33,9 +33,15 @@ const Dashboard = () => {
         if (!stats) return;
 
         setUniqueProjects(loaded ? filterUniqueProjects(stats) : []);
+
         const projectStat = stats.filter((f: any) => f.project_id === projectId)[0];
         if (projectStat) {
             setProject({ name: projectStat.name, value: projectStat.project_id });
+        }
+
+        const preferredProject = localStorage.getItem('preferredProject');
+        if (preferredProject) {
+            setProject(JSON.parse(preferredProject));
         }
     }, [stats, loaded, projectId]);
 
@@ -51,6 +57,7 @@ const Dashboard = () => {
 
     const setProjectFunction = (value: { name: string; value: string; }) => {
         setProject(value);
+        localStorage.setItem('preferredProject', JSON.stringify(value));
         router.push(`/dashboard?project=${value.value}`, undefined, { shallow: true });
     }
 
