@@ -48,7 +48,7 @@ const Select = ({ options, selected, setSelected }: { options: { name: string, v
     }, [selected]);
 
     return (
-        <div ref={wrapperRef} className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { toggleDropdown() }}>
+        <div ref={wrapperRef} className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) toggleDropdown() }}>
             <div className="w-full">
                 <div className="flex flex-col items-center relative">
                     <div className="p-1 flex rounded w-full h-full">

@@ -123,11 +123,7 @@ const Dashboard = () => {
             return 0;
         }
 
-        if (downloadsReceivedToday > downloadsReceivedYesterday) {
-            return downloadsReceivedYesterday > 0 ? Math.round((downloadsReceivedToday / downloadsReceivedYesterday) * 100) / 100 : downloadsReceivedToday * 100;
-        }
-
-        return downloadsReceivedYesterday > 0 ? Math.round((downloadsReceivedToday - downloadsReceivedYesterday) / downloadsReceivedYesterday * 10000) / 100 : downloadsReceivedYesterday;
+        return Math.round(((downloadsReceivedToday - downloadsReceivedYesterday) / downloadsReceivedYesterday * 100) * 100) / 100;
     }
 
     const calculateFollowersPercentage = () => {
@@ -141,11 +137,7 @@ const Dashboard = () => {
             return 0;
         }
 
-        if (followsReceivedToday > followsReceivedYesterday) {
-            return followsReceivedYesterday > 0 ? Math.round((followsReceivedToday / followsReceivedYesterday) * 100) / 100 : followsReceivedToday * 100;
-        }
-
-        return followsReceivedYesterday > 0 ? Math.round((followsReceivedToday - followsReceivedYesterday) / followsReceivedYesterday * 10000) / 100 : followsReceivedYesterday;
+        return Math.round(((followsReceivedToday - followsReceivedYesterday) / followsReceivedYesterday * 100) * 100) / 100;
     }
 
     return (
