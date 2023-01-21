@@ -1,9 +1,22 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import { Collapse } from 'react-collapse';
 
 const MultiSelect = ({ options, standard, selected, setSelected }: { options: { name: string, value: string }[]; standard: string, selected: { name: string, value: string }[]; setSelected: Function }) => {
 
     const [dropdown, setDropdown] = useState(false);
+    const wrapperRef = useRef(null);
+
+    useEffect(() => {
+        function handleClickOutside(event: any) {
+            if (wrapperRef.current && !(wrapperRef.current as any).contains(event.target)) {
+                setDropdown(false);
+            }
+        }
+        document.addEventListener("mousedown", handleClickOutside);
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        }
+    }, [wrapperRef]);
 
     const toggleItem = (val: { name: string; value: string }) => {
         if (selected.find(c => c.value === val.value)) {
@@ -31,7 +44,7 @@ const MultiSelect = ({ options, standard, selected, setSelected }: { options: { 
     }, []);
 
     return (
-        <div className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
+        <div ref={wrapperRef} className={"w-full flex flex-col bg-[#434956] rounded-xl items-center mx-auto z-10 relative " + (dropdown ? "rounded-b-none" : "")} onClick={() => { if (!dropdown) setDropdown(!dropdown) }}>
             <div className="w-full">
                 <div className="flex flex-col items-center relative">
                     <div className="p-1 flex rounded w-full h-full">
