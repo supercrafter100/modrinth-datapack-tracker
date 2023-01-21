@@ -22,3 +22,33 @@ export interface ModrinthProject {
     color: number;
 }
 
+export interface ModrinthVersion {
+    id: string;
+    project_id: string;
+    author_id: string;
+    featured: boolean;
+    name: string;
+    version_number: string;
+    changelog: string;
+    changelog_url: string;
+    date_published: string;
+    downloads: number;
+    version_type: string;
+    status: string;
+    requested_status: string | null;
+    files: {
+        hashes: {
+            sha512: string;
+            sha1: string
+        };
+        url: string;
+        filename: string;
+        primary: boolean;
+        size: number;
+        file_type: string | null
+    }[];
+    dependencies: string[];
+    game_versions: string[];
+    loaders: string[];
+}
+

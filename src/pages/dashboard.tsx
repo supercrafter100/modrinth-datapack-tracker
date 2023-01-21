@@ -4,7 +4,7 @@ import Select from '@/components/form/Select'
 import useRequest from '@/hooks/useRequest'
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { ModrinthProject } from '@/types/ModrinthAPI';
+import { ModrinthProject, ModrinthVersion } from '@/types/ModrinthAPI';
 import DownloadChart from '@/components/DownloadChart';
 import { useRouter } from 'next/router';
 import FollowerChart from '@/components/FollowerChart';
@@ -20,6 +20,7 @@ const Dashboard = () => {
 
     const [project, setProject] = useState<{ name: string; value: string; }>();
     const [modrinthProject, setModrinthProject] = useState<ModrinthProject | undefined>();
+    const [modrinthVersions, setModrinthVersions] = useState<ModrinthVersion[] | undefined>();
 
     const [modrinthProjectListings, loadedModrinthProjectListings] = useRequest<{ hits: ModrinthProject[] }>('https://api.modrinth.com/v2/search?limit=20&index=relevance&facets=[[%22categories:%27datapack%27%22],[%22project_type:mod%22]]');
     const [stats, loaded] = useRequest<any>('/api/stats');
@@ -66,9 +67,15 @@ const Dashboard = () => {
         if (!res) {
             return;
         }
-
         const data = await res.json();
         setModrinthProject(data);
+
+        const res2 = await fetch(`https://api.modrinth.com/v2/project/${id}/version`).catch((err) => console.error(err));
+        if (!res2) {
+            return;
+        }
+        const data2 = await res2.json();
+        setModrinthVersions(data2);
     }
 
     const fetchFutureData = async (id: string) => {
@@ -148,8 +155,8 @@ const Dashboard = () => {
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>
-            <main className="h-full p-10">
-                <div className="mx-auto max-w-[80vw] h-full">
+            <main className="h-full py-10 px-5 sm:px-10">
+                <div className="mx-auto sm:max-w-[80vw] h-full">
                     {/* Top level selection */}
                     <div className="bg-card rounded-lg p-3 flex flex-wrap justify-center content-center">
                         <div className="w-3/4 lg:w-1/2">
@@ -207,6 +214,18 @@ const Dashboard = () => {
                             <h2 className="text-inputtext text-2xl font-bold text-center">Follows</h2>
                             <FollowerChart data={project ? [...selectedProjectStats, { id: (selectedProjectStats[selectedProjectStats.length - 1]?.id + 1), project_id: project.value, downloads: modrinthProject?.downloads, follows: modrinthProject?.followers, date: "TODAY" }] : []} />
                         </div>
+
+                        {/* Sidebar versions */}
+                        <div className="bg-card rounded-lg p-3 w-full mt-5 2xl:col-span-3 2xl:col-start-2 2xl:col-end-5">
+                            <div className="flex flex-col gap-2 p-5">
+                                <div className="grid grid-cols-3 gap-2 mx-4">
+                                    <h2 className="text-white font-bold text-xl w-full">Version</h2>
+                                    <h2 className="text-white font-bold text-xl w-full hidden lg:block">Supports</h2>
+                                    <h2 className="text-white font-bold text-xl w-full hidden lg:block">Stats</h2>
+                                </div>
+                                {modrinthVersions && modrinthVersions.map((version) => <VersionsRow key={version.id} versionData={version} />)}
+                            </div>
+                        </div>
                     </div>
                 </div>
             </main>
@@ -259,6 +278,47 @@ const DownloadsTable = ({ data }: { data: { name: string; downloads: number }[] 
             </tbody>
         </table>
     </div>
+}
+
+const VersionsRow = ({ versionData }: { versionData: ModrinthVersion }) => {
+    const date = new Date(versionData.date_published);
+
+    return (
+        <div className="lg:grid grid-cols-3 gap-2 hover:bg-[#414146] rounded-lg p-4 transition-colors duration-100">
+            <div className="w-full">
+                <Link href={`https://modrinth.com/datapack/${versionData.project_id}/version/${versionData.version_number}/`} className="font-bold text-inputtext text-lg">
+                    {versionData.name}
+                </Link>
+                <div className="flex flex-row items-center">
+                    <span className={"w-2 h-2 rounded-full inline-block mr-1 " + (versionData.version_type === "release" ? "bg-primarygreen text-primarygreen" : "bg-[#FFA347] text-[#FFA347]")}></span>
+                    <span className={"font-bold mr-2 " + (versionData.version_type === "release" ? "text-primarygreen" : "text-[#FFA347]")}>{capitalizeFirst(versionData.version_type)}</span>
+                    <span className="text-inputtext font-medium">{versionData.version_number}</span>
+                </div>
+            </div>
+            <div className="w-full flex flex-col">
+                <span className="font-medium text-inputtext">{versionData.loaders.map(c => capitalizeFirst(c)).join(', ')}</span>
+                <span className="font-medium text-inputtext">{versionData.game_versions.join(', ')}</span>
+            </div>
+            <div className="w-full flex flex-col">
+                <span className="font-medium text-inputtext"><strong>{versionData.downloads}</strong> downloads</span>
+                <span className="font-medium text-inputtext">Published on <strong>{date.toLocaleDateString("en-US", { month: 'short', day: '2-digit', year: 'numeric' })}</strong></span>
+            </div>
+        </div>
+    )
+}
+
+function capitalizeFirst(text: string, capitalizeAll = false) {
+
+    if (capitalizeAll) {
+        let words = text.split(/ +/g);
+        for (const word of words) {
+            const capitalizedWord = word.charAt(0).toUpperCase() + word.slice(1);
+            words[words.indexOf(word)] = capitalizedWord;
+        }
+        return words.join(' ');
+    }
+
+    return text.charAt(0).toUpperCase() + text.slice(1);
 }
 
 export default Dashboard
