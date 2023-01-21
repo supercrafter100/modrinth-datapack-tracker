@@ -65,8 +65,10 @@ const Dashboard = () => {
     }
 
     const fetchFutureData = async (id: string) => {
-        const result = await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${id}/future.json`).then((res) => res.json());
-        setFutureProjectStats(result);
+        const result = await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${id}/future.json`).then((res) => res.json()).catch(() => undefined);
+        if (result) {
+            setFutureProjectStats(result);
+        }
     }
 
     const getTopDownloadedProjectsYesterday = () => {
@@ -150,7 +152,7 @@ const Dashboard = () => {
             <main className="h-full p-10">
                 <div className="mx-auto max-w-[80vw] h-full">
                     {/* Top level selection */}
-                    <div className="bg-card rounded-lg p-3 flex justify-center content-center">
+                    <div className="bg-card rounded-lg p-3 flex flex-wrap justify-center content-center">
                         <div className="w-3/4 lg:w-1/2">
                             <Select selected={project} setSelected={setProjectFunction} options={uniqueProjects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
                         </div>
