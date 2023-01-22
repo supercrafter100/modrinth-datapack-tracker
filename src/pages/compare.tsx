@@ -5,17 +5,16 @@ import useRequest from '@/hooks/useRequest'
 import { faCaretUp, faCaretDown } from '@fortawesome/free-solid-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import DownloadChart from '@/components/DownloadChart';
-import FollowerChart from '@/components/FollowerChart';
-import Toggle from '@/components/form/Toggle';
 import AverageGrowthChart from '@/components/AverageGrowthChart';
 import Link from 'next/link';
 import Image from 'next/image';
-import MultiSelect from '@/components/form/MultiSelect';
 import { ModrinthProject } from '@/types/ModrinthAPI';
 import { StatisticsResponse } from '@/types/StatisticsResponse';
+import { useRouter } from 'next/router';
 
 const Dashboard = () => {
 
+    const router = useRouter();
 
     const [projectStatistics, loadedProjectStatistics] = useRequest<any>('/api/stats');
     const [projects, setProjects] = useState<{ name: string; id: string; }[]>([]);
@@ -43,6 +42,25 @@ const Dashboard = () => {
     useEffect(() => {
         if (!projectStatistics) return;
         setProjects(loadedProjectStatistics ? filterUniqueProjects(projectStatistics) : []);
+
+        const preferredProject1 = localStorage.getItem('prefferredProject1');
+        const preferredProject2 = localStorage.getItem('prefferredProject2');
+
+        if (preferredProject1) {
+            const parsedPreferredProject1 = JSON.parse(preferredProject1);
+            setProject1(parsedPreferredProject1);
+        }
+        if (preferredProject2) {
+            const parsedPreferredProject2 = JSON.parse(preferredProject2);
+            setProject2(parsedPreferredProject2);
+        }
+
+        if (router.query.project1) {
+            setProject1({ name: projects.find((project) => project.id === router.query.project1)?.name || '', value: router.query.project1 as string });
+        }
+        if (router.query.project2) {
+            setProject2({ name: projects.find((project) => project.id === router.query.project2)?.name || '', value: router.query.project2 as string });
+        }
     }, [projectStatistics, loadedProjectStatistics]);
 
     const filterUniqueProjects = (projects: { name: string; project_id: string; }[]) => {
@@ -54,6 +72,24 @@ const Dashboard = () => {
         });
         return unique;
     }
+
+    /**
+     * Project choosing
+     */
+    const selectProject1 = (value: { name: string; value: string; }) => {
+        setProject1(value);
+        localStorage.setItem('prefferredProject1', JSON.stringify(value));
+        router.query.project1 = value.value;
+        router.push(router, undefined, { shallow: true });
+    }
+
+    const selectProject2 = (value: { name: string; value: string; }) => {
+        setProject2(value);
+        localStorage.setItem('prefferredProject2', JSON.stringify(value));
+        router.query.project2 = value.value;
+        router.push(router, undefined, { shallow: true });
+    }
+
 
     /**
      * Calculates the % increase from now and the previous day
@@ -99,7 +135,7 @@ const Dashboard = () => {
                         <div className="flex flex-col gap-5">
                             <div className="bg-card rounded-lg p-3 flex flex-wrap justify-center content-center">
                                 <div className="w-3/4 lg:w-1/2">
-                                    <Select selected={project1} setSelected={setProject1} options={projects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
+                                    <Select selected={project1} setSelected={selectProject1} options={projects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
                                 </div>
                                 <Link href={`https://modrinth.com/project/${project1?.value || ''}`} className="ml-2 flex items-center border-primarygreen border-2 rounded-lg p-1">
                                     <Image src="/modrinth-logo.svg" alt="modrinth-logo" width={24} height={24} className="inline-block" />
@@ -108,9 +144,9 @@ const Dashboard = () => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <StatisticsTopCard title="Downloads" value={modrinthProject1?.downloads.toString() || '?'} />
-                                <StatisticsTopCard title="Downloads today" value={(modrinthProject1?.downloads! - project1Data[project1Data.length - 1].downloads).toString()} percent={calculateDownloadIncrease(project1Data, modrinthProject1!)} />
+                                <StatisticsTopCard title="Downloads today" value={(modrinthProject1?.downloads! - project1Data[project1Data.length - 1]?.downloads).toString()} percent={calculateDownloadIncrease(project1Data, modrinthProject1!)} />
                                 <StatisticsTopCard title="Followers" value={modrinthProject1?.followers.toString() || '?'} />
-                                <StatisticsTopCard title="Followers today" value={(modrinthProject1?.followers! - project1Data[project1Data.length - 1].follows).toString()} percent={calculateFollowIncrease(project1Data, modrinthProject1!)} />
+                                <StatisticsTopCard title="Followers today" value={(modrinthProject1?.followers! - project1Data[project1Data.length - 1]?.follows).toString()} percent={calculateFollowIncrease(project1Data, modrinthProject1!)} />
                             </div>
                             <div className="bg-card rounded-lg p-3 w-full">
                                 <h2 className="text-inputtext text-2xl font-bold text-center">Downloads</h2>
@@ -124,7 +160,7 @@ const Dashboard = () => {
                         <div className="flex flex-col gap-5">
                             <div className="bg-card rounded-lg p-3 flex flex-wrap justify-center content-center">
                                 <div className="w-3/4 lg:w-1/2">
-                                    <Select selected={project2} setSelected={setProject2} options={projects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
+                                    <Select selected={project2} setSelected={selectProject2} options={projects.map((item) => ({ name: item.name, value: item.id })).sort((a, b) => a.name.localeCompare(b.name))} />
                                 </div>
                                 <Link href={`https://modrinth.com/project/${project1?.value || ''}`} className="ml-2 flex items-center border-primarygreen border-2 rounded-lg p-1">
                                     <Image src="/modrinth-logo.svg" alt="modrinth-logo" width={24} height={24} className="inline-block" />
@@ -133,9 +169,9 @@ const Dashboard = () => {
                             </div>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
                                 <StatisticsTopCard title="Downloads" value={modrinthProject2?.downloads.toString() || '?'} />
-                                <StatisticsTopCard title="Downloads today" value={(modrinthProject2?.downloads! - project2Data[project2Data.length - 1].downloads).toString()} percent={calculateDownloadIncrease(project2Data, modrinthProject2!)} />
+                                <StatisticsTopCard title="Downloads today" value={(modrinthProject2?.downloads! - project2Data[project2Data.length - 1]?.downloads).toString()} percent={calculateDownloadIncrease(project2Data, modrinthProject2!)} />
                                 <StatisticsTopCard title="Followers" value={modrinthProject2?.followers.toString() || '?'} />
-                                <StatisticsTopCard title="Followers today" value={(modrinthProject2?.followers! - project2Data[project2Data.length - 1].follows).toString()} percent={calculateFollowIncrease(project2Data, modrinthProject2!)} />
+                                <StatisticsTopCard title="Followers today" value={(modrinthProject2?.followers! - project2Data[project2Data.length - 1]?.follows).toString()} percent={calculateFollowIncrease(project2Data, modrinthProject2!)} />
                             </div>
                             <div className="bg-card rounded-lg p-3 w-full">
                                 <h2 className="text-inputtext text-2xl font-bold text-center">Downloads</h2>
