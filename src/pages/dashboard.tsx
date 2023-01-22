@@ -159,7 +159,7 @@ const Dashboard = () => {
         <>
             <Head>
                 <title>Modrinth downloads tracker | Dashboard</title>
-                <meta name="description" content="Dashboard for everything :D" />
+                <meta name="description" content="A little dashboard to view info about a tracked datapack" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>

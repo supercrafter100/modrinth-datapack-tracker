@@ -133,7 +133,7 @@ const Dashboard = () => {
         <>
             <Head>
                 <title>Modrinth datapack tracker | Compare</title>
-                <meta name="description" content="Dashboard for everything :D" />
+                <meta name="description" content="Compare two tracked datapacks against eachother" />
                 <meta name="viewport" content="width=device-width, initial-scale=1" />
                 <link rel="icon" href="/favicon.ico" />
             </Head>

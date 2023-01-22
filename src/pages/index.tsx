@@ -62,7 +62,7 @@ export default function Home() {
     <>
       <Head>
         <title>Modrinth downloads tracker</title>
-        <meta name="description" content="Download & follower statistics of the modrinth datapacks" />
+        <meta name="description" content="Download & follower statistics of the top modrinth datapacks" />
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
