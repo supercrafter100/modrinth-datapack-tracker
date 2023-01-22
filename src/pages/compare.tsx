@@ -56,12 +56,12 @@ const Dashboard = () => {
         }
 
         if (router.query.project1) {
-            setProject1({ name: projects.find((project) => project.id === router.query.project1)?.name || '', value: router.query.project1 as string });
+            setProject1({ name: projectStatistics.find((project: any) => project.project_id === router.query.project1)?.name || '', value: router.query.project1 as string });
         }
         if (router.query.project2) {
-            setProject2({ name: projects.find((project) => project.id === router.query.project2)?.name || '', value: router.query.project2 as string });
+            setProject2({ name: projectStatistics.find((project: any) => project.project_id === router.query.project2)?.name || '', value: router.query.project2 as string });
         }
-    }, [projectStatistics, loadedProjectStatistics]);
+    }, [projectStatistics, loadedProjectStatistics, router.query.project1, router.query.project2]);
 
     const filterUniqueProjects = (projects: { name: string; project_id: string; }[]) => {
         const unique: any[] = [];
@@ -104,6 +104,10 @@ const Dashboard = () => {
             return 0;
         }
 
+        if (receivedYesterday === 0) {
+            return receivedToday * 100;
+        }
+
         return Math.round(((receivedToday - receivedYesterday) / receivedYesterday * 100) * 100) / 100;
     }
 
@@ -115,6 +119,10 @@ const Dashboard = () => {
 
         if (receivedYesterday === receivedToday) {
             return 0;
+        }
+
+        if (receivedYesterday === 0) {
+            return receivedToday * 100;
         }
 
         return Math.round(((receivedToday - receivedYesterday) / receivedYesterday * 100) * 100) / 100;

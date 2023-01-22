@@ -130,6 +130,10 @@ const Dashboard = () => {
             return 0;
         }
 
+        if (downloadsReceivedYesterday === 0) {
+            return downloadsReceivedToday * 100;
+        }
+
         return Math.round(((downloadsReceivedToday - downloadsReceivedYesterday) / downloadsReceivedYesterday * 100) * 100) / 100;
     }
 
@@ -142,6 +146,10 @@ const Dashboard = () => {
 
         if (followsReceivedYesterday === followsReceivedToday) {
             return 0;
+        }
+
+        if (followsReceivedYesterday === 0) {
+            return followsReceivedToday * 100;
         }
 
         return Math.round(((followsReceivedToday - followsReceivedYesterday) / followsReceivedYesterday * 100) * 100) / 100;
