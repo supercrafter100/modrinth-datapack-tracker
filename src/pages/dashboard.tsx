@@ -79,7 +79,7 @@ const Dashboard = () => {
     }
 
     const fetchFutureData = async (id: string) => {
-        const result = await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${id}/future.json`).then((res) => res.json()).catch(() => undefined);
+        const result = await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/models/${id}/future.json`).then((res) => res.json()).catch(() => undefined);
         if (result) {
             setFutureProjectStats(result);
         }

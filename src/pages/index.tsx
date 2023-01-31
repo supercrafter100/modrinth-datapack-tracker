@@ -45,7 +45,7 @@ export default function Home() {
   const getFutureData = async () => {
     let d: any[] = [];
     for (const project of uniqueProjects) {
-      await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/${project.id}/future.json`).then((res) => res.json()).then((data) => {
+      await fetch(`${process.env.NEXT_PUBLIC_MODEL_URL}/models/${project.id}/future.json`).then((res) => res.json()).then((data) => {
         d = [...d, ...data];
       }).catch((e) => console.log(e));
     }
